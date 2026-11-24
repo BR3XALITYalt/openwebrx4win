@@ -9,8 +9,8 @@ from owrx.config.core import CoreConfig
 class CoreConfigPlatformDefaultsTest(unittest.TestCase):
     @unittest.skipUnless(os.name == "nt", "Windows defaults are only active on Windows")
     def testWindowsPathsUseWindowsLocations(self):
-        program_data = os.environ.get("PROGRAMDATA") or (Path.home() / "AppData" / "Local")
-        data_root = Path(program_data) / "OpenWebRX"
+        local_app_data = os.environ.get("LOCALAPPDATA") or (Path.home() / "AppData" / "Local")
+        data_root = Path(local_app_data) / "OpenWebRX"
 
         self.assertEqual(
             Path(CoreConfig.defaultSearchLocations[1]),
