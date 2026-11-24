@@ -109,25 +109,58 @@ class CpuUsageThread(threading.Thread):
             return 0
 
     def get_cpu_usage(self):
-        try:
-            f = open("/proc/stat", "r")
-        except:
-            return 0  # Workaround, possibly we're on a Mac
-        line = ""
-        while not "cpu " in line:
-            line = f.readline()
-        f.close()
-        spl = line.split(" ")
-        worktime = int(spl[2]) + int(spl[3]) + int(spl[4])
-        idletime = int(spl[5])
+        if os.name == "nt":
+            import ctypes
+            from ctypes import wintypes
+
+            class FILETIME(ctypes.Structure):
+                _fields_ = [
+                    ("dwLowDateTime", wintypes.DWORD),
+                    ("dwHighDateTime", wintypes.DWORD),
+                ]
+
+            idle = FILETIME()
+            kernel = FILETIME()
+            user = FILETIME()
+            get_system_times = ctypes.WinDLL("kernel32", use_last_error=True).GetSystemTimes
+            get_system_times.argtypes = [
+                ctypes.POINTER(FILETIME),
+                ctypes.POINTER(FILETIME),
+                ctypes.POINTER(FILETIME),
+            ]
+            get_system_times.restype = wintypes.BOOL
+
+            if not get_system_times(
+                ctypes.byref(idle),
+                ctypes.byref(kernel),
+                ctypes.byref(user),
+            ):
+                return 0
+
+            def to_int(value):
+                return (value.dwHighDateTime << 32) | value.dwLowDateTime
+
+            idletime = to_int(idle)
+            worktime = to_int(kernel) + to_int(user) - idletime
+        else:
+            try:
+                with open("/proc/stat", "r") as cpu_file:
+                    line = next(line for line in cpu_file if line.startswith("cpu "))
+            except (OSError, StopIteration):
+                return 0
+
+            values = line.split()
+            worktime = sum(int(value) for value in values[1:4])
+            idletime = int(values[4])
+
         dworktime = worktime - self.last_worktime
         didletime = idletime - self.last_idletime
-        rate = float(dworktime) / (didletime + dworktime)
+        total = dworktime + didletime
         self.last_worktime = worktime
         self.last_idletime = idletime
-        if self.last_worktime == 0:
+        if total <= 0:
             return 0
-        return rate
+        return float(dworktime) / total
 
     def get_battery(self):
         voltage = 0.0
