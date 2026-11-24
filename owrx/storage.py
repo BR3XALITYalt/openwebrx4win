@@ -111,7 +111,7 @@ class Storage(object):
         quantize_colors = pm["image_quantize_colors"] # int. Number of colors in palette.
         
         # Adds storage path
-        if not inFile.startswith('/'):
+        if not os.path.isabs(inFile):
             inFile = self.getFilePath(inFile)
         # Only converting BMP files for now
         outFile = re.sub(r'\.bmp$', '.png', inFile)
