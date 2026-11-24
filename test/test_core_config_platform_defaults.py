@@ -24,6 +24,10 @@ class CoreConfigPlatformDefaultsTest(unittest.TestCase):
             Path(CoreConfig.defaults["core"]["temporary_directory"]),
             Path(tempfile.gettempdir()),
         )
+        self.assertEqual(
+            Path(CoreConfig.defaults["aprs"]["symbols_path"]),
+            data_root / "aprs-symbols" / "png",
+        )
 
     @unittest.skipUnless(os.name != "nt", "Non-Windows defaults are not active on Windows")
     def testNonWindowsPathsRemainUnchanged(self):
@@ -38,6 +42,10 @@ class CoreConfigPlatformDefaultsTest(unittest.TestCase):
         self.assertEqual(
             CoreConfig.defaults["core"]["temporary_directory"],
             "/tmp",
+        )
+        self.assertEqual(
+            CoreConfig.defaults["aprs"]["symbols_path"],
+            "/usr/share/aprs-symbols/png",
         )
 
 
