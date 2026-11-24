@@ -80,17 +80,27 @@ class Markers(object):
         self.smarkers = {}
         self.thread = None
         # Known database files
-        self.fileList = [
-            "markers.json",
-            "/etc/openwebrx/markers.json",
-        ]
-        # Find additional marker files in the markers.d folder
-        try:
+        if os.name == "nt":
+            markersRoot = CoreConfig.windowsDataDirectory
+            self.fileList = [
+                "markers.json",
+                str(markersRoot / "markers.json"),
+            ]
+            markersDir = markersRoot / "markers.d"
+        else:
+            self.fileList = [
+                "markers.json",
+                "/etc/openwebrx/markers.json",
+            ]
             markersDir = "/etc/openwebrx/markers.d"
-            self.fileList += [ markersDir + "/" + file
+
+        # Find additional marker files in the markers.d folder.
+        try:
+            self.fileList += [
+                os.path.join(str(markersDir), file)
                 for file in os.listdir(markersDir) if file.endswith(".json")
             ]
-        except Exception:
+        except OSError:
             pass
 
     # Start the main thread
