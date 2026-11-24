@@ -66,3 +66,14 @@ These sources informed the repository rules. Apply the relevant principles to Mu
 - [Addy Osmani's Code Review and Quality skill](https://github.com/addyosmani/agent-skills/blob/main/skills/code-review-and-quality/SKILL.md): avoid unnecessary abstractions and review the changed code.
 - [Google Material communication principles](https://codelabs.developers.google.com/codelabs/material-communication-guidance): keep interface copy direct and limited to the information needed for the current task.
 - [W3C Web Content Accessibility Guidelines 2.2](https://www.w3.org/TR/WCAG22/): check text alternatives, keyboard operation, focus, and contrast.
+
+## Windows port scope
+
+This repository is a platform-compatibility port of upstream OpenWebRX+. Preserve upstream receiver behavior, web interface, settings, configuration semantics, decoders, and supported SDR types.
+
+- Change code only where required for Windows compatibility or to test that compatibility.
+- Do not add application features, receiver features, decoders, plugins, custom desktop interfaces, or interface redesigns.
+- Do not remove existing functionality to make a Windows build pass. Record unsupported dependencies and port them.
+- Keep Linux behavior and defaults unchanged.
+- Do not use WSL2, Docker, virtual machines, or an embedded Linux installation as the Windows runtime.
+- Keep platform-specific code isolated where practical and test Windows changes on Windows as well as Linux regression behavior.
