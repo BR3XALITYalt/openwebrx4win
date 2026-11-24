@@ -47,3 +47,11 @@ Relevant upstream sources:
 5. Verify receiver start, sample streaming, control updates, and shutdown through the unchanged OpenWebRX+ backend.
 
 A component is not Windows-supported merely because CMake generates build files. It must compile, load, communicate with the rest of OpenWebRX+, and pass runtime tests on Windows.
+
+## Other host integrations
+
+The Python application also contains Linux-specific host integrations that need Windows implementations before claiming full feature parity.
+
+- `owrx/wifi.py` invokes NetworkManager's `nmcli` for connection profiles, radio control, and access-point setup. The WiFi settings page calls this manager when settings are saved. Port this behavior to the Windows WLAN APIs and an equivalent supported hotspot mechanism; do not remove the settings page or leave its controls inert.
+- CPU percentage now uses Win32 `GetSystemTimes` on Windows. CPU temperature and battery telemetry still use Linux sensor files or the optional `/tmp/battery` file and need Windows equivalents where the host exposes those values.
+- APRS symbol assets use the Windows per-user data directory by default. The Windows dependency/package setup must install the same symbol dataset there so the existing APRS symbol endpoint continues to work.
