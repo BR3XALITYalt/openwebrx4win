@@ -3,28 +3,55 @@ from configparser import ConfigParser
 from pathlib import Path
 from typing import List, Optional
 import os
+import tempfile
 
 
 class CoreConfig(object):
-    defaultSearchLocations = ["./openwebrx.conf", "/etc/openwebrx/openwebrx.conf"]
-
-    defaults = {
-        "core": {
-            "data_directory": "/var/lib/openwebrx",
-            "temporary_directory": "/tmp",
-            "log_level": "INFO",
-            "temperature_sensor": "/sys/class/thermal/thermal_zone0/temp",
-        },
-        "web": {
-            "port": 8073,
-            "ipv6": True,
-            # won't work this way because values must be strings, but this is effectively the way it behaves.
-            #"bind_address": None,
-        },
-        "aprs": {
-            "symbols_path": "/usr/share/aprs-symbols/png"
+    if os.name == "nt":
+        windowsDataDirectory = (
+            Path(os.environ.get("PROGRAMDATA") or (Path.home() / "AppData" / "Local"))
+            / "OpenWebRX"
+        )
+        defaultSearchLocations = [
+            "./openwebrx.conf",
+            str(windowsDataDirectory / "openwebrx.conf"),
+        ]
+        defaults = {
+            "core": {
+                "data_directory": str(windowsDataDirectory / "data"),
+                "temporary_directory": tempfile.gettempdir(),
+                "log_level": "INFO",
+                "temperature_sensor": "",
+            },
+            "web": {
+                "port": 8073,
+                "ipv6": True,
+                # won't work this way because values must be strings, but this is effectively the way it behaves.
+                #"bind_address": None,
+            },
+            "aprs": {
+                "symbols_path": "/usr/share/aprs-symbols/png"
+            }
         }
-    }
+    else:
+        defaultSearchLocations = ["./openwebrx.conf", "/etc/openwebrx/openwebrx.conf"]
+        defaults = {
+            "core": {
+                "data_directory": "/var/lib/openwebrx",
+                "temporary_directory": "/tmp",
+                "log_level": "INFO",
+                "temperature_sensor": "/sys/class/thermal/thermal_zone0/temp",
+            },
+            "web": {
+                "port": 8073,
+                "ipv6": True,
+                # won't work this way because values must be strings, but this is effectively the way it behaves.
+                #"bind_address": None,
+            },
+            "aprs": {
+                "symbols_path": "/usr/share/aprs-symbols/png"
+            }
+        }
 
     sharedConfig = None
 
@@ -62,6 +89,11 @@ class CoreConfig(object):
     def __init__(self):
         config = CoreConfig.sharedConfig
         self.data_directory = config.get("core", "data_directory")
+        if (
+            os.name == "nt"
+            and self.data_directory == CoreConfig.defaults["core"]["data_directory"]
+        ):
+            Path(self.data_directory).mkdir(parents=True, exist_ok=True)
         CoreConfig.checkDirectory(self.data_directory, "data_directory")
         self.temporary_directory = config.get("core", "temporary_directory")
         CoreConfig.checkDirectory(self.temporary_directory, "temporary_directory")
