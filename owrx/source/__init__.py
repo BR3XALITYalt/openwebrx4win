@@ -5,7 +5,6 @@ import os
 import socket
 import shlex
 import time
-import signal
 import pkgutil
 from abc import ABC, abstractmethod
 from owrx.command import CommandMapper
@@ -374,8 +373,7 @@ class SdrSource(ABC):
             else:
                 # single command
                 cmd = cmd[0]
-                # start_new_session can go as soon as there's no piped commands left
-                # the os.killpg call must be replaced with something more reasonable at the same time
+                # Use a separate process group so shutdown does not affect OpenWebRX.
                 self.process = subprocess.Popen(
                     shlex.split(cmd),
                     **get_process_start_options(),
