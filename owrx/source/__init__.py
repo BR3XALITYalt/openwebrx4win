@@ -20,6 +20,7 @@ from owrx.form.section import OptionalSection
 from owrx.reporting import ReportingEngine
 from owrx.feature import FeatureDetector
 from owrx.log import LogPipe, HistoryHandler
+from owrx.process import get_process_start_options, stop_process
 from datetime import datetime
 from typing import List
 from enum import Enum
@@ -366,7 +367,7 @@ class SdrSource(ABC):
                 self.process = subprocess.Popen(
                     cmd,
                     shell=True,
-                    start_new_session=True,
+                    **get_process_start_options(),
                     stdout=self.stdoutPipe,
                     stderr=self.stderrPipe
                 )
@@ -377,7 +378,7 @@ class SdrSource(ABC):
                 # the os.killpg call must be replaced with something more reasonable at the same time
                 self.process = subprocess.Popen(
                     shlex.split(cmd),
-                    start_new_session=True,
+                    **get_process_start_options(),
                     stdout=self.stdoutPipe,
                     stderr=self.stderrPipe
                 )
