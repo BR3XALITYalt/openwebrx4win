@@ -206,7 +206,8 @@ class FeatureDetector(object):
                     process.kill()
 
             if expected_result is None:
-                return rc != 32512
+                # Popen succeeded, so the executable exists even if its help command exits nonzero.
+                return True
             else:
                 return rc == expected_result
         except (FileNotFoundError, PermissionError):
