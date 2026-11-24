@@ -30,7 +30,7 @@ class CoreConfig(object):
                 #"bind_address": None,
             },
             "aprs": {
-                "symbols_path": "/usr/share/aprs-symbols/png"
+                "symbols_path": str(windowsDataDirectory / "aprs-symbols" / "png")
             }
         }
     else:
