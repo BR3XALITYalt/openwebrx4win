@@ -64,7 +64,7 @@ class StopProcessTest(unittest.TestCase):
 
         with patch("owrx.process.os.getpgid", return_value=1234, create=True), patch(
             "owrx.process.os.killpg", create=True
-        ) as killpg:
+        ) as killpg, patch("owrx.process.signal.SIGKILL", 9, create=True):
             forced = stop_process(process, monitor, is_windows=False)
 
         self.assertFalse(forced)
