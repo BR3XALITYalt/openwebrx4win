@@ -1,0 +1,32 @@
+name: Windows port compatibility
+
+on:
+  push:
+    branches:
+      - windows-port-foundation
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  compatibility-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+          - ubuntu-latest
+        python-version:
+          - "3.11"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run platform compatibility tests
+        run: python -m unittest test.test_core_config_platform_defaults test.test_process test.test_feature_detector
