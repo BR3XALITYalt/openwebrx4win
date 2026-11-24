@@ -1,0 +1,45 @@
+import os
+import tempfile
+import unittest
+from pathlib import Path
+
+from owrx.config.core import CoreConfig
+
+
+class CoreConfigPlatformDefaultsTest(unittest.TestCase):
+    @unittest.skipUnless(os.name == "nt", "Windows defaults are only active on Windows")
+    def testWindowsPathsUseWindowsLocations(self):
+        program_data = os.environ.get("PROGRAMDATA") or (Path.home() / "AppData" / "Local")
+        data_root = Path(program_data) / "OpenWebRX"
+
+        self.assertEqual(
+            Path(CoreConfig.defaultSearchLocations[1]),
+            data_root / "openwebrx.conf",
+        )
+        self.assertEqual(
+            Path(CoreConfig.defaults["core"]["data_directory"]),
+            data_root / "data",
+        )
+        self.assertEqual(
+            Path(CoreConfig.defaults["core"]["temporary_directory"]),
+            Path(tempfile.gettempdir()),
+        )
+
+    @unittest.skipUnless(os.name != "nt", "Non-Windows defaults are not active on Windows")
+    def testNonWindowsPathsRemainUnchanged(self):
+        self.assertEqual(
+            CoreConfig.defaultSearchLocations,
+            ["./openwebrx.conf", "/etc/openwebrx/openwebrx.conf"],
+        )
+        self.assertEqual(
+            CoreConfig.defaults["core"]["data_directory"],
+            "/var/lib/openwebrx",
+        )
+        self.assertEqual(
+            CoreConfig.defaults["core"]["temporary_directory"],
+            "/tmp",
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()
