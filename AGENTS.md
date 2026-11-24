@@ -1,38 +1,5 @@
 # Repository instructions
 
-## Project
-
-MultiV is a multi-source, multi-stream client for virtual radio simulators. The desktop app uses Tkinter and accepts microphone, desktop-audio, and playlist input. See [ROADMAP.md](ROADMAP.md) for provider support and integration status. `web_gui.py` serves a password-protected control panel on the local network.
-
-Call the application **MultiV**. Use **TXITY** for the service, website, station directory, and remote protocol.
-
-## Product behavior
-
-- MultiV is a provider-agnostic, multi-broadcast system. It is not exclusive to TXITY; treat TXITY as one output provider alongside Icecast and other supported providers.
-- Output providers must operate independently. Each output has its own enable/disable control, and disabling or disconnecting one provider must not disable, block, or otherwise affect other enabled providers.
-- Route the selected audio source to every enabled output concurrently. Do not make Icecast transmission depend on a TXITY connection or authentication session, or make TXITY transmission depend on Icecast availability.
-- Keep provider-specific configuration and connection state separate. Shared audio capture may feed multiple outputs, but each output's lifecycle and failure handling must remain isolated.
-- In the Transmit page, present TXITY and Icecast as separate collapsible output rows. Each row has an independent enable toggle and a draggable handle for pointer-based reordering. Support Up and Down keys when the handle has focus. Persist the enabled state and order.
-- Remove Stations from the main navigation. Put Station directory in the TXITY menu and open it in a separate window containing the searchable live station list. Station details must provide a route back to that window.
-
-## Before editing
-
-- Read [DESIGN.md](DESIGN.md) before changing either interface.
-- Read [PRODUCT.md](PRODUCT.md) before changing product positioning or marketing copy.
-- Use [ROADMAP.md](ROADMAP.md) as the source of truth for provider support. Do not maintain separate provider lists.
-- Inspect the relevant implementation and nearby tests before changing behavior.
-- Keep changes within the requested scope. Do not replace working code to impose a personal style.
-- After Python changes, run `python -m compileall -q .` and `python -m unittest discover -s tests -v`.
-- When a runtime is available, launch the interface you changed. Passing tests do not prove that a GUI works.
-
-## Interface rules
-
-- Use ttkbootstrap for standard interface widgets and its themed Tk equivalents for the scroll canvas, listboxes, multiline text editor, menus, and secondary windows. Keep the existing Sun Valley-compatible light/dark color values in the custom MultiV themes. Use classic Tk widgets only where ttkbootstrap has no compatible equivalent.
-- Keep the browser panel consistent with its current layout. Add gradients, animation, activity indicators, or panels only when they serve a documented purpose.
-- Follow the ENERGY, RHYTHM, and MOTION dials in [DESIGN.md](DESIGN.md). Record the reason for any major visual change.
-- Make controls keyboard-accessible. Give each input a visible label, keep focus visible, and maintain readable contrast. Do not use color as the only status indicator.
-- Use semantic HTML and native controls in the browser panel. Expose status changes through accessible status regions.
-
 ## Writing standard
 
 Apply these rules to the README, developer documentation, design notes, code comments, docstrings, CLI help, dialogs, notifications, logs shown to users, desktop controls, and browser controls.
