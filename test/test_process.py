@@ -63,7 +63,7 @@ class StopProcessTest(unittest.TestCase):
         monitor.is_alive.return_value = False
 
         with patch("owrx.process.os.getpgid", return_value=1234, create=True), patch(
-            "owrx.process.os.killpg"
+            "owrx.process.os.killpg", create=True
         ) as killpg:
             forced = stop_process(process, monitor, is_windows=False)
 
@@ -76,8 +76,8 @@ class StopProcessTest(unittest.TestCase):
         monitor = Mock()
         monitor.is_alive.return_value = True
 
-        with patch("owrx.process.os.getpgid", return_value=1234), patch(
-            "owrx.process.os.killpg"
+        with patch("owrx.process.os.getpgid", return_value=1234, create=True), patch(
+            "owrx.process.os.killpg", create=True
         ) as killpg:
             forced = stop_process(process, monitor, is_windows=False)
 
