@@ -9,7 +9,7 @@ import tempfile
 class CoreConfig(object):
     if os.name == "nt":
         windowsDataDirectory = (
-            Path(os.environ.get("PROGRAMDATA") or (Path.home() / "AppData" / "Local"))
+            Path(os.environ.get("LOCALAPPDATA") or (Path.home() / "AppData" / "Local"))
             / "OpenWebRX"
         )
         defaultSearchLocations = [
