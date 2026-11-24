@@ -479,21 +479,13 @@ class SdrSource(ABC):
 
             if self.process is not None:
                 self.setState(SdrSourceState.STOPPING)
-                try:
-                    os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
-                    if self.monitor:
-                        # wait 10 seconds for a regular shutdown
-                        self.monitor.join(10)
-                        # if the monitor is still running, the process still hasn't ended, so kill it
-                    if self.monitor:
-                        self.logger.warning("source has not shut down normally within 10 seconds, sending SIGKILL")
-                        os.killpg(os.getpgid(self.process.pid), signal.SIGKILL)
-                except ProcessLookupError:
-                    # been killed by something else, ignore
-                    pass
-                except AttributeError:
-                    # self.process has been overwritten by the monitor since we checked it, which is fine
-                    pass
+                process = self.process
+                monitor = self.monitor
+                forced = stop_process(process, monitor, timeout=10)
+                if forced:
+                    self.logger.warning(
+                        "source has not shut down normally within 10 seconds, terminating it"
+                    )
 
             if self.monitor:
                 self.monitor.join()
